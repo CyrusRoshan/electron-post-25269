@@ -26,10 +26,15 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 const offset = [100, 100]
+var windows = []
 app.whenReady().then(() => {
   for (let i = 0; i < 3; i++) {
     const win = createWindow()
-    allowOverlaying(win, 5)
+    windows.push(win)
+
+    if (i !== 0) { // Make the first window a normal window
+      allowOverlaying(win, 5)
+    }
 
     const size = win.getSize()
     win.setPosition(
@@ -43,15 +48,17 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
-
-    i++
-    const newVisible = i % 2 == 0
-    console.log('Visible on all workspaces?', newVisible)
-    const windows = BrowserWindow.getAllWindows()
-    windows.forEach(w => {
-      w.setVisibleOnAllWorkspaces(newVisible, {visibleOnFullScreen: newVisible})
-    })
   })
+
+  setInterval(() => {
+    i++
+    const newVisible = i % 2 < 1
+    console.log('Visible on all workspaces?', newVisible)
+    for (var j = 1; j < windows.length; j++) { // Don't modify the first window
+      console.log(j, windows.length)
+      windows[j].setVisibleOnAllWorkspaces(newVisible, {visibleOnFullScreen: newVisible})
+    }
+  }, 3000)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
